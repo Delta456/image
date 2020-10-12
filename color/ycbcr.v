@@ -314,7 +314,7 @@ pub fn new_cmyk_model() Model {
 } 
 
 fn cmyk_model(c Color) Color {
-	if _, ok := c.(CMYK); ok {
+	if c is Cmyk {
 		return c
 	}
 	r, g, b, _ := c.rgba()
