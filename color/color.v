@@ -156,7 +156,7 @@ pub fn (g Gray16) rbga() (u32, u32, u32, u32) {
 	return y, y, y, 0xffff
 }
 
-pub erface Model {
+pub interface Model {
 	convert(c Color) Color
 }
 
@@ -170,6 +170,38 @@ struct ModelFn {
 
 fn (m &ModelFn) convert(c Color) Color {
 	return m.f(c)
+}
+
+pub fn new_rbga_model() Model {
+	return model_fn(rbga_model)
+}
+
+pub fn new_rbga64_model() Model {
+	return model_fn(rbga64_model)
+}
+
+pub fn new_nrbga_model() Model {
+	return model_fn(nrbga_model)
+}
+
+pub fn new_nrbga64_model() Model {
+	return model_fn(nrbga64_model)
+}
+
+pub fn new_alpha_model() Model {
+	return model_fn(alpha_model)
+}
+
+pub fn new_alpha16_model() Model {
+	return model_fn(alpha16_model)
+}
+
+pub fn new_gray_model() Model {
+	return model_fn(gray_model)
+}
+
+pub fn new_gray16_model() Model {
+	return model_fn(gray16_model)
 }
 
 fn rbga_model(c Color) Color {
@@ -210,7 +242,7 @@ fn nrbga64_model(c Color) Color {
 	if c is Nrbga64 {
 		return c
 	}
-	r, g, b, a := c.rbga()
+	mut r, mut g, mut b, mut a := c.rbga()
 	if a == 0xffff {
 		return Nrbga64{u16(r), u16(g), u16(b), 0xffff}
 	}
@@ -274,4 +306,11 @@ fn gray16_model(c Color) Color {
 
 	return Gray16{u16(y)}
 }
+
+pub const (
+	black = Gray16{0}
+	white = Gray16{0xffffff}
+	transparent = Alpha16{0}
+	opaque = Alpha16{0xffffff}
+)
 
