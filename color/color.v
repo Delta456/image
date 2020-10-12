@@ -1,6 +1,6 @@
 module color
 
-pub erface Color {
+pub interface Color {
 	rbga() (u32, u32, u32, u32)
 }
 
