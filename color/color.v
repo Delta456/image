@@ -25,13 +25,12 @@ pub fn (rb Rbga) rbga() (u32, u32, u32, u32) {
 	b |= b << 8
 
 	mut g := u32(rb.g)
-	g |=  g << 8
+	g |= g << 8
 
 	mut a := u32(rb.a)
-	a |=  a << 8
+	a |= a << 8
 
-	return r, b, g, a 
-
+	return r, b, g, a
 }
 
 // rbga64 represents a 64-bit alpha-premultiplied color, having 16 bits for
@@ -43,7 +42,7 @@ pub struct Rbga64 {
 pub:
 	r u16
 	g u16
-	b u16	
+	b u16
 	a u16
 }
 
@@ -56,7 +55,7 @@ pub struct Nrbga {
 pub:
 	r byte
 	g byte
-	b byte	
+	b byte
 	a byte
 }
 
@@ -78,7 +77,6 @@ pub fn (c Nrbga) rbga() (u32, u32, u32, u32) {
 
 	mut a := u32(c.a)
 	a |= a << 8
-
 	return r, g, b, a
 }
 
@@ -101,12 +99,11 @@ pub fn (c Nrbga64) rbga() (u32, u32, u32, u32) {
 	g *= u32(c.a)
 	g /= 0xffff
 
-	mut b = u32(c.b)
+	mut b := u32(c.b)
 	b *= u32(c.a)
 	b /= 0xffff
 
 	a = u32(c.a)
-
 	return r, g, b, a
 }
 
@@ -116,8 +113,8 @@ pub:
 	a byte
 }
 
-pub fn (a Alpha) rbga() (u32, u32, u32, u32) {
-	mut a := u32(a.a)
+pub fn (al Alpha) rbga() (u32, u32, u32, u32) {
+	mut a := u32(al.a)
 	a |= a << 8
 	return a, a, a, a
 }
@@ -128,8 +125,8 @@ pub:
 }
 
 // Alpha16 represents a 16-bit alpha color
-pub fn (a Alpha16) rbga() (u32, u32, u32, u32) {
-	a := u32(a.a)
+pub fn (al Alpha16) rbga() (u32, u32, u32, u32) {
+	a := u32(al.a)
 	return a, a, a, a
 }
 
@@ -142,7 +139,7 @@ pub:
 pub fn (g Gray) rbga() (u32, u32, u32, u32) {
 	mut y := u32(g.y)
 	y |= y << 8
-	return y, y, y, 0xffff 
+	return y, y, y, 0xffff
 }
 
 // Gray16 represents an 16-bit grayscale color.
@@ -160,12 +157,12 @@ pub interface Model {
 	convert(c Color) Color
 }
 
-fn model_fn(fn fn(Color) Color) &Model {
+fn model_fn(f fn (color.Color) Color) &Model {
 	return &ModelFn{f}
 }
 
 struct ModelFn {
-	f fn(Color) Color
+	f fn (color.Color) Color
 }
 
 fn (m &ModelFn) convert(c Color) Color {
@@ -280,14 +277,13 @@ fn gray_model(c Color) Color {
 
 	// These coefficients (the fractions 0.299, 0.587 and 0.114) are the same
 	// as those given by the JFIF specification and used by fn RGBToYCbCr in
-	// ycbcr.go.
+	// ycbcr.v.
 	//
 	// Note that 19595 + 38470 + 7471 equals 65536.
 	//
 	// The 24 is 16 + 8. The 16 is the same as used in RGBToYCbCr. The 8 is
 	// because the return value is 8 bit color, not 16 bit color.
-	y := (19595*r + 38470*g + 7471*b + 1<<15) >> 24
-
+	y := (19595 * r + 38470 * g + 7471 * b + 1 << 15) >> 24
 	return Gray{byte(y)}
 }
 
@@ -299,18 +295,16 @@ fn gray16_model(c Color) Color {
 
 	// These coefficients (the fractions 0.299, 0.587 and 0.114) are the same
 	// as those given by the JFIF specification and used by fn RGBToYCbCr in
-	// ycbcr.go.
+	// ycbcr.v.
 	//
 	// Note that 19595 + 38470 + 7471 equals 65536.
-	y := (19595*r + 38470*g + 7471*b + 1<<15) >> 16
-
+	y := (19595 * r + 38470 * g + 7471 * b + 1 << 15) >> 16
 	return Gray16{u16(y)}
 }
 
 pub const (
-	black = Gray16{0}
-	white = Gray16{0xffffff}
+	black       = Gray16{0}
+	white       = Gray16{0xffffff}
 	transparent = Alpha16{0}
-	opaque = Alpha16{0xffffff}
+	opaque      = Alpha16{0xffffff}
 )
-
