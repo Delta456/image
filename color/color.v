@@ -1,15 +1,15 @@
 module color
 
 pub interface Color {
-	rbga() (u32, u32, u32, u32)
+	rgba() (u32, u32, u32, u32)
 }
 
-// rbga represents a traditional 32-bit alpha-premultiplied color, having 8
+// rgba represents a traditional 32-bit alpha-premultiplied color, having 8
 // bits for each of red, green, blue and alpha.
 //
 // An alpha-premultiplied color component C has been scaled by alpha (A), so
 // has valid values 0 <= C <= A.
-pub struct Rbga {
+pub struct Rgba {
 pub:
 	r byte
 	g byte
@@ -17,7 +17,7 @@ pub:
 	a byte
 }
 
-pub fn (rb Rbga) rbga() (u32, u32, u32, u32) {
+pub fn (rb Rgba) rgba() (u32, u32, u32, u32) {
 	mut r := u32(rb.r)
 	r |= r << 8
 
@@ -33,12 +33,12 @@ pub fn (rb Rbga) rbga() (u32, u32, u32, u32) {
 	return r, b, g, a
 }
 
-// rbga64 represents a 64-bit alpha-premultiplied color, having 16 bits for
+// rgba64 represents a 64-bit alpha-premultiplied color, having 16 bits for
 // each of red, green, blue and alpha.
 //
 // An alpha-premultiplied color component C has been scaled by alpha (A), so
 // has valid values 0 <= C <= A.
-pub struct Rbga64 {
+pub struct Rgba64 {
 pub:
 	r u16
 	g u16
@@ -46,12 +46,12 @@ pub:
 	a u16
 }
 
-pub fn (c Rbga64) rbga() (u32, u32, u32, u32) {
+pub fn (c Rgba64) rgba() (u32, u32, u32, u32) {
 	return u32(c.r), u32(c.g), u32(c.b), u32(c.a)
 }
 
-// Nrbga represents a non-alpha-premultiplied 32-bit color.
-pub struct Nrbga {
+// Nrgba represents a non-alpha-premultiplied 32-bit color.
+pub struct Nrgba {
 pub:
 	r byte
 	g byte
@@ -59,7 +59,7 @@ pub:
 	a byte
 }
 
-pub fn (c Nrbga) rbga() (u32, u32, u32, u32) {
+pub fn (c Nrgba) rgba() (u32, u32, u32, u32) {
 	mut r := u32(c.r)
 	r |= r << 8
 	r *= u32(c.a)
@@ -80,9 +80,9 @@ pub fn (c Nrbga) rbga() (u32, u32, u32, u32) {
 	return r, g, b, a
 }
 
-// Nrbga64 represents a non-alpha-premultiplied 64-bit color,
+// Nrgba64 represents a non-alpha-premultiplied 64-bit color,
 // having 16 bits for each of red, green, blue and alpha.
-pub struct Nrbga64 {
+pub struct Nrgba64 {
 pub:
 	r u16
 	g u16
@@ -90,7 +90,7 @@ pub:
 	a u16
 }
 
-pub fn (c Nrbga64) rbga() (u32, u32, u32, u32) {
+pub fn (c Nrgba64) rgba() (u32, u32, u32, u32) {
 	mut r := u32(c.r)
 	r *= u32(c.a)
 	r /= 0xffff
@@ -113,7 +113,7 @@ pub:
 	a byte
 }
 
-pub fn (al Alpha) rbga() (u32, u32, u32, u32) {
+pub fn (al Alpha) rgba() (u32, u32, u32, u32) {
 	mut a := u32(al.a)
 	a |= a << 8
 	return a, a, a, a
@@ -125,7 +125,7 @@ pub:
 }
 
 // Alpha16 represents a 16-bit alpha color
-pub fn (al Alpha16) rbga() (u32, u32, u32, u32) {
+pub fn (al Alpha16) rgba() (u32, u32, u32, u32) {
 	a := u32(al.a)
 	return a, a, a, a
 }
@@ -136,7 +136,7 @@ pub:
 	y byte
 }
 
-pub fn (g Gray) rbga() (u32, u32, u32, u32) {
+pub fn (g Gray) rgba() (u32, u32, u32, u32) {
 	mut y := u32(g.y)
 	y |= y << 8
 	return y, y, y, 0xffff
@@ -148,7 +148,7 @@ pub:
 	y u16
 }
 
-pub fn (g Gray16) rbga() (u32, u32, u32, u32) {
+pub fn (g Gray16) rgba() (u32, u32, u32, u32) {
 	y := u32(g.y)
 	return y, y, y, 0xffff
 }
@@ -169,20 +169,20 @@ fn (m &ModelFn) convert(c Color) Color {
 	return m.f(c)
 }
 
-pub fn new_rbga_model() Model {
-	return model_fn(rbga_model)
+pub fn new_rgba_model() Model {
+	return model_fn(rgba_model)
 }
 
-pub fn new_rbga64_model() Model {
-	return model_fn(rbga64_model)
+pub fn new_rgba64_model() Model {
+	return model_fn(rgba64_model)
 }
 
-pub fn new_nrbga_model() Model {
-	return model_fn(nrbga_model)
+pub fn new_nrgba_model() Model {
+	return model_fn(nrgba_model)
 }
 
-pub fn new_nrbga64_model() Model {
-	return model_fn(nrbga64_model)
+pub fn new_nrgba64_model() Model {
+	return model_fn(nrgba64_model)
 }
 
 pub fn new_alpha_model() Model {
@@ -201,63 +201,63 @@ pub fn new_gray16_model() Model {
 	return model_fn(gray16_model)
 }
 
-fn rbga_model(c Color) Color {
-	if c is Rbga {
+fn rgba_model(c Color) Color {
+	if c is Rgba {
 		return c
 	}
-	r, g, b, a := c.rbga()
-	return Rbga{byte(r >> 8), byte(g >> 8), byte(b >> 8), byte(a >> 8)}
+	r, g, b, a := c.rgba()
+	return Rgba{byte(r >> 8), byte(g >> 8), byte(b >> 8), byte(a >> 8)}
 }
 
-fn rbga64_model(c Color) Color {
-	if c is Rbga64 {
+fn rgba64_model(c Color) Color {
+	if c is Rgba64 {
 		return c
 	}
-	r, g, b, a := c.rbga()
-	return Rbga64{u16(r), u16(g), u16(b), u16(a)}
+	r, g, b, a := c.rgba()
+	return Rgba64{u16(r), u16(g), u16(b), u16(a)}
 }
 
-fn nrbga_model(c Color) Color {
-	if c is Nrbga {
+fn nrgba_model(c Color) Color {
+	if c is Nrgba {
 		return c
 	}
-	mut r, mut g, mut b, mut a := c.rbga()
+	mut r, mut g, mut b, mut a := c.rgba()
 	if a == 0xffff {
-		return Nrbga{byte(r >> 8), byte(g >> 8), byte(b >> 8), 0xff}
+		return Nrgba{byte(r >> 8), byte(g >> 8), byte(b >> 8), 0xff}
 	}
 	if a == 0 {
-		return Nrbga{0, 0, 0, 0}
+		return Nrgba{0, 0, 0, 0}
 	}
-	// Since Color.rbga returns an alpha-premultiplied color, we should have r <= a && g <= a && b <= a.
+	// Since Color.rgba returns an alpha-premultiplied color, we should have r <= a && g <= a && b <= a.
 	r = (r * 0xffff) / a
 	g = (g * 0xffff) / a
 	b = (b * 0xffff) / a
-	return Nrbga{byte(r >> 8), byte(g >> 8), byte(b >> 8), byte(a >> 8)}
+	return Nrgba{byte(r >> 8), byte(g >> 8), byte(b >> 8), byte(a >> 8)}
 }
 
-fn nrbga64_model(c Color) Color {
-	if c is Nrbga64 {
+fn nrgba64_model(c Color) Color {
+	if c is Nrgba64 {
 		return c
 	}
-	mut r, mut g, mut b, mut a := c.rbga()
+	mut r, mut g, mut b, mut a := c.rgba()
 	if a == 0xffff {
-		return Nrbga64{u16(r), u16(g), u16(b), 0xffff}
+		return Nrgba64{u16(r), u16(g), u16(b), 0xffff}
 	}
 	if a == 0 {
-		return Nrbga64{0, 0, 0, 0}
+		return Nrgba64{0, 0, 0, 0}
 	}
-	// Since Color.rbga returns an alpha-premultiplied color, we should have r <= a && g <= a && b <= a.
+	// Since Color.rgba returns an alpha-premultiplied color, we should have r <= a && g <= a && b <= a.
 	r = (r * 0xffff) / a
 	g = (g * 0xffff) / a
 	b = (b * 0xffff) / a
-	return Nrbga64{u16(r), u16(g), u16(b), u16(a)}
+	return Nrgba64{u16(r), u16(g), u16(b), u16(a)}
 }
 
 fn alpha_model(c Color) Color {
 	if c is Alpha {
 		return c
 	}
-	_, _, _, a := c.rbga()
+	_, _, _, a := c.rgba()
 	return Alpha{byte(a >> 8)}
 }
 
@@ -265,7 +265,7 @@ fn alpha16_model(c Color) Color {
 	if c is Alpha16 {
 		return c
 	}
-	_, _, _, a := c.rbga()
+	_, _, _, a := c.rgba()
 	return Alpha16{u16(a)}
 }
 
@@ -273,7 +273,7 @@ fn gray_model(c Color) Color {
 	if c is Gray {
 		return c
 	}
-	r, g, b, _ := c.rbga()
+	r, g, b, _ := c.rgba()
 
 	// These coefficients (the fractions 0.299, 0.587 and 0.114) are the same
 	// as those given by the JFIF specification and used by fn RGBToYCbCr in
@@ -291,7 +291,7 @@ fn gray16_model(c Color) Color {
 	if c is Gray16 {
 		return c
 	}
-	r, g, b, _ := c.rbga()
+	r, g, b, _ := c.rgba()
 
 	// These coefficients (the fractions 0.299, 0.587 and 0.114) are the same
 	// as those given by the JFIF specification and used by fn RGBToYCbCr in
