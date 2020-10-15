@@ -1,6 +1,6 @@
 module color
 
-pub fn ycbcr_to_rgb(y, cb, cr byte) (byte, byte, byte, byte) {
+pub fn ycbcr_to_rgb(y, cb, cr byte) (byte, byte, byte) {
 	yy1 := int(y) * 0x10101
 	cb1 := int(cb) - 128
 	cr1 := int(cr) - 128
@@ -42,7 +42,7 @@ pub fn rgb_to_ycbcr(r, g, b byte) (byte, byte, byte, byte) {
 	} else {
 		cr = ~(cr >> 31)
 	}
-	return byte(yy), byte(cb), byte(cr)
+	return byte(yy), byte(cb), byte(cr), 0
 }
 
 pub struct YCbCr {
@@ -52,7 +52,7 @@ pub:
 	cr byte
 }
 
-pub fn (c YCbCr) rgba() (u32, u32, u32, u32) {
+pub fn (c YCbCr) rbga() (u32, u32, u32, u32) {
 	yy1 := int(c.y) * 0x10101
 	cb1 := int(c.cb) - 128
 	cr1 := int(c.cr) - 128
@@ -80,42 +80,42 @@ pub fn (c YCbCr) rgba() (u32, u32, u32, u32) {
 pub fn new_ycbcr_model() Model {
 	return model_fn(ycbcr_model)
 }
-
+/*
 fn ycbcr_model(c Color) Color {
 	if c is YCbCr {
 		return c
 	}
 	r, g, b, _ := c.rbga()
-	y, u, v := rbg_to_ycbcr(byte(r >> 8), byte(g >> 8), byte(b >> 8))
+	y, u, v, _ := rgb_to_ycbcr(byte(r >> 8), byte(g >> 8), byte(b >> 8))
 	return YCbCr{y, u, v}
 }
-
+*/
 pub struct NyCbCr {
 pub:
 	y YCbCr
 	a byte
 }
 
-fn (c NyCbCr) rgba() (u32, u32, u32, u32) {
+fn (c NyCbCr) rbga() (u32, u32, u32, u32) {
 	// This code is a copy of the YCbCrToRGB fntion above, except that it
 	// returns values in the range [0, 0xffff] instead of [0, 0xff]. There is a
 	// subtle difference between doing this and having YCbCr satisfy the Color
-	// interface by first converting to an rgba. The latter loses some
+	// interface by first converting to an rbga. The latter loses some
 	// information by going to and from 8 bits per channel.
 	//
 	// For example, this code:
 	// const y, cb, cr = 0x7f, 0x7f, 0x7f
 	// r, g, b := color.YCbCrTRGB(y, cb, cr)
-	// r0, g0, b0, _ := color.YCbCr{y, cb, cr}.rgba()
-	// r1, g1, b1, _ := color.rgba{r, g, b, 0xff}.rgba()
+	// r0, g0, b0, _ := color.YCbCr{y, cb, cr}.rbga()
+	// r1, g1, b1, _ := color.rbga{r, g, b, 0xff}.rbga()
 	// fmt.Printf("0x%04x 0x%04x 0x%04x\n", r0, g0, b0)
 	// fmt.Printf("0x%04x 0x%04x 0x%04x\n", r1, g1, b1)
 	// prints:
 	// 0x7e18 0x808d 0x7db9
 	// 0x7e7e 0x8080 0x7d7d
-	yy1 := int(c.Y) * 0x10101
-	cb1 := int(c.Cb) - 128
-	cr1 := int(c.Cr) - 128
+	yy1 := int(c.y.y) * 0x10101
+	cb1 := int(c.y.cb) - 128
+	cr1 := int(c.y.cr) - 128
 	// The bit twiddling below is equivalent to
 	//
 	// r := (yy1 + 91881*cr1) >> 8
@@ -147,18 +147,18 @@ fn (c NyCbCr) rgba() (u32, u32, u32, u32) {
 	}
 	return u32(r), u32(g), u32(b), 0xffff
 }
-
+/*
 // YCbCrModel is the Model for Y'CbCr colors.
 pub fn new_ycbcr_model() Model {
 	return model_fn(ycbcr_model)
 }
-
+*/
 fn ycbcr_model(c Color) Color {
 	if c is YCbCr {
 		return c
 	}
-	r, g, b, _ := c.rgba()
-	y, u, v := rgb_To_ycbcr(byte(r >> 8), byte(g >> 8), byte(b >> 8))
+	r, g, b, _ := c.rbga()
+	y, u, v, _ := rgb_to_ycbcr(byte(r >> 8), byte(g >> 8), byte(b >> 8))
 	return YCbCr{y, u, v}
 }
 
@@ -167,11 +167,11 @@ fn ycbcr_model(c Color) Color {
 struct NYCbCrA {
 pub:
 	y YCbCr
-	A byte
+	a byte
 }
 
-fn (c NYCbCrA) rgba() (u32, u32, u32, u32) {
-	// The first part of this method is the same as YCbCr.rgba.
+fn (c NYCbCrA) rbga() (u32, u32, u32, u32) {
+	// The first part of this method is the same as YCbCr.rbga.
 	yy1 := int(c.y.y) * 0x10101
 	cb1 := int(c.y.cb) - 128
 	cr1 := int(c.y.cr) - 128
@@ -205,7 +205,7 @@ fn (c NYCbCrA) rgba() (u32, u32, u32, u32) {
 		b = ~(b >> 31) & 0xffff
 	}
 	// The second part of this method applies the alpha.
-	a := u32(c.A) * 0x101
+	a := u32(c.a) * 0x101
 	return u32(r) * a / 0xffff, u32(g) * a / 0xffff, u32(b) * a / 0xffff, a
 }
 
@@ -221,7 +221,7 @@ fn nYCbCrAModel(c Color) Color {
 	case YCbCr:
 		return NYCbCrA{c, 0xff}
 	}
-	r, g, b, a := c.rgba()
+	r, g, b, a := c.rbga()
 
 	// Convert from alpha-premultiplied to non-alpha-premultiplied.
 	if a != 0 {
@@ -276,13 +276,13 @@ pub:
 	k byte
 }
 
-pub fn (c Cmyk) rgba() (u32, u32, u32, u32) {
+pub fn (c Cmyk) rbga() (u32, u32, u32, u32) {
 	// This code is a copy of the cmyk_to_rgb fntion above, except that it
 	// returns values in the range [0, 0xffff] instead of [0, 0xff].
-	w := 0xffff - u32(c.K) * 0x101
-	r := (0xffff - u32(c.C) * 0x101) * w / 0xffff
-	g := (0xffff - u32(c.M) * 0x101) * w / 0xffff
-	b := (0xffff - u32(c.Y) * 0x101) * w / 0xffff
+	w := 0xffff - u32(c.k) * 0x101
+	r := (0xffff - u32(c.c) * 0x101) * w / 0xffff
+	g := (0xffff - u32(c.m) * 0x101) * w / 0xffff
+	b := (0xffff - u32(c.y) * 0x101) * w / 0xffff
 	return r, g, b, 0xffff
 }
 
@@ -295,7 +295,7 @@ fn cmyk_model(c Color) Color {
 	if c is Cmyk {
 		return c
 	}
-	r, g, b, _ := c.rgba()
-	cc, mm, yy, kk := rgb_to_cymk(byte(r >> 8), byte(g >> 8), byte(b >> 8))
-	return CMYK{cc, mm, yy, kk}
+	r, g, b, _ := c.rbga()
+	cc, mm, yy, kk := rgb_to_cmyk(byte(r >> 8), byte(g >> 8), byte(b >> 8))
+	return Cmyk{cc, mm, yy, kk}
 }

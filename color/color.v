@@ -21,7 +21,7 @@ pub fn (rb Rbga) rbga() (u32, u32, u32, u32) {
 	mut r := u32(rb.r)
 	r |= r << 8
 
-	mut b := u33(rb.b)
+	mut b := u32(rb.b)
 	b |= b << 8
 
 	mut g := u32(rb.g)
@@ -103,7 +103,7 @@ pub fn (c Nrbga64) rbga() (u32, u32, u32, u32) {
 	b *= u32(c.a)
 	b /= 0xffff
 
-	a = u32(c.a)
+	a := u32(c.a)
 	return r, g, b, a
 }
 
@@ -149,7 +149,7 @@ pub:
 }
 
 pub fn (g Gray16) rbga() (u32, u32, u32, u32) {
-	y := u32(c.Y)
+	y := u32(g.y)
 	return y, y, y, 0xffff
 }
 
@@ -157,12 +157,12 @@ pub interface Model {
 	convert(c Color) Color
 }
 
-fn model_fn(f fn (color.Color) Color) &Model {
-	return &ModelFn{f}
+fn model_fn(f fn (Color) Color) Model {
+	return ModelFn{f}
 }
 
 struct ModelFn {
-	f fn (color.Color) Color
+	f fn (Color) Color
 }
 
 fn (m &ModelFn) convert(c Color) Color {
