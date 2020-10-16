@@ -59,19 +59,11 @@ fn test_ycbcr_to_rgb_consistency() {
 fn test_ycbcr_gray() {
 	for i := 0; i < 256; i++ {
 		c0 := color.YCbCr{byte(i), 0x80, 0x80}
-		c1 := color.Gray{byte(i)}
-		r0, g0, b0, a0 := c0.rgba()
-		r1, g1, b1, a1 := c1.rgba()
-		if (r0 != r1) || (g0 != g1) || (b0 != b1) || (a0 != a1) {
-			eprintln('$c0 and $c1 are not equal')
-			assert false
-		}
-		/* TODO: figure out why is segment faults
+		c1 := color.Gray{byte(i)}	
 		if !eq(c0, c1) {
 			eprintln('$c0 and $c1 are not equal')
 			assert false
 		}
-		*/
 	}
 	assert true
 }
