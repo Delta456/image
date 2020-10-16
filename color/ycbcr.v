@@ -81,7 +81,7 @@ pub fn ycbcr_to_rgb(y, cb, cr byte) (byte, byte, byte) {
 	return byte(r), byte(g), byte(b)
 }
 
-pub fn rgb_to_ycbcr(r, g, b byte) (byte, byte, byte, byte) {
+pub fn rgb_to_ycbcr(r, g, b byte) (byte, byte, byte) {
 	// The JFIF specification says:
 	//	Y' =  0.2990*R + 0.5870*G + 0.1140*B
 	//	Cb = -0.1687*R - 0.3313*G + 0.5000*B + 128
@@ -122,7 +122,7 @@ pub fn rgb_to_ycbcr(r, g, b byte) (byte, byte, byte, byte) {
 	} else {
 		cr = ~(cr >> 31)
 	}
-	return byte(yy), byte(cb), byte(cr), 0
+	return byte(yy), byte(cb), byte(cr)
 }
 
 // YCbCr represents a fully opaque 24-bit Y'CbCr color, having 8 bits each for
@@ -254,7 +254,7 @@ fn ycbcr_model(c Color) Color {
 		return c
 	}
 	r, g, b, _ := c.rgba()
-	y, u, v, _ := rgb_to_ycbcr(byte(r >> 8), byte(g >> 8), byte(b >> 8))
+	y, u, v := rgb_to_ycbcr(byte(r >> 8), byte(g >> 8), byte(b >> 8))
 	return YCbCr{y, u, v}
 }
 

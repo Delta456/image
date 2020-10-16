@@ -1,10 +1,19 @@
 module color
 
+// Color can convert itself to alpha-premultiplied 16-bits per channel RGBA.
+// The conversion may be lossy.
 pub interface Color {
+	// RGBA returns the alpha-premultiplied red, green, blue and alpha values
+	// for the color. Each value ranges within [0, 0xffff], but is represented
+	// by a uint32 so that multiplying by a blend factor up to 0xffff will not
+	// overflow.
+	//
+	// An alpha-premultiplied color component c has been scaled by alpha (a),
+	// so has valid values 0 <= c <= a.
 	rgba() (u32, u32, u32, u32)
 }
 
-// rgba represents a traditional 32-bit alpha-premultiplied color, having 8
+// Rgba represents a traditional 32-bit alpha-premultiplied color, having 8
 // bits for each of red, green, blue and alpha.
 //
 // An alpha-premultiplied color component C has been scaled by alpha (A), so
@@ -33,7 +42,7 @@ pub fn (rb Rgba) rgba() (u32, u32, u32, u32) {
 	return r, b, g, a
 }
 
-// rgba64 represents a 64-bit alpha-premultiplied color, having 16 bits for
+// Rgba64 represents a 64-bit alpha-premultiplied color, having 16 bits for
 // each of red, green, blue and alpha.
 //
 // An alpha-premultiplied color component C has been scaled by alpha (A), so

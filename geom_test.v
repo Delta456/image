@@ -22,10 +22,11 @@ fn test_rectangle() {
 			want2 := inside(s, r)
 			if got != want && got != want2 {
 				eprintln('eq r=$r, s=$s: got $got, want $want')
-				exit(1)
+				assert false
 			}
 		}
 	}
+	assert true 
 
 }
 
