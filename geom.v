@@ -130,7 +130,7 @@ pub fn (r Rectangle) inset(n int) Rectangle {
 	return r1
 }
 
-// Intersect returns the largest rectangle contained by both r and s. If the
+// intersect returns the largest rectangle contained by both r and s. If the
 // two rectangles do not overlap then the zero rectangle will be returned.
 fn (r Rectangle) intersect(s Rectangle) Rectangle {
 	mut r1 := Rectangle{}
@@ -155,8 +155,8 @@ fn (r Rectangle) intersect(s Rectangle) Rectangle {
 	}
 	return r1
 }
-// Union returns the smallest rectangle that contains both r and s.
-pub fn (r Rectangle) union_(s Rectangle) Rectangle {
+// join returns the smallest rectangle that contains both r and s.
+pub fn (r Rectangle) join(s Rectangle) Rectangle {
 	mut r1 := Rectangle{} 
 	if r.empty() {
 		return s

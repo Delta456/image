@@ -36,7 +36,7 @@ pub interface PalettedImage {
 	at(x int, y int) color.Color
 }
 
-pub struct Rgba {
+pub struct RGBA {
 	// pix holds the image's pixels, in R, G, B, A order. The pixel at
 	// (x, y) starts at pix[(y-rect.min.y)*stride + (x-rect.min.x)*4].
 	pix []byte
@@ -46,37 +46,38 @@ pub struct Rgba {
 	rect Rectangle
 }
 
-pub fn (r Rgba) color_model() color.Model {
+pub fn (r RGBA) color_model() color.Model {
 	return color.new_rgba_model()
 }
 
-pub fn (r Rgba) bounds() Rectangle {
+pub fn (r RGBA) bounds() Rectangle {
 	return r.rect
 }
 
-pub fn (r Rgba) at(x int, y int) color.Color {
-	return r.rgba_at(x, y)
+pub fn (r RGBA) at(x int, y int) color.Color {
+	res := r.rgba_at(x, y) //temporary workaround for now
+	return res 
 }
 
-pub fn (r Rgba) rgba_at(x int, y int) color.Rgba {
+pub fn (r RGBA) rgba_at(x int, y int) color.RGBA {
 	p := Point{x, y}
 	if !p.inside(r.rect) {
-		return color.Rgba{}
+		return color.RGBA{}
 	}
 	i := r.pix_offset(x, y)
 	s := r.pix[i..i+4]
-	return color.Rgba{s[0], s[1], s[2], s[3]}
+	return color.RGBA{s[0], s[1], s[2], s[3]}
 }
 
 
 // pix_offset returns the index of the first element of `pix` that corresponds to
 // the pixel at (x, y).
-pub fn (p Rgba) pix_offset(x int, y int) int {
+pub fn (p RGBA) pix_offset(x int, y int) int {
 	return (y-p.rect.min.y)*p.stride + (x-p.rect.min.x)*4
 }
 
 /* TODO
-fn (p Rgba) set(xint , y int, c color.Color) {
+fn (p RGBA) set(xint , y int, c color.Color) {
 	if !(Point{x, y}.inside(p.Rect)) {
 		return
 	}
@@ -89,7 +90,7 @@ fn (p Rgba) set(xint , y int, c color.Color) {
 	s[3] = c1.A
 }
 */
-pub fn (r Rgba) set_rgba(x int, y int, c color.Rgba) {
+pub fn (r RGBA) set_rgba(x int, y int, c color.RGBA) {
 	p := Point{x, y}
 	if !p.inside(r.rect) {
 		return

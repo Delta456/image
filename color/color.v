@@ -13,12 +13,12 @@ pub interface Color {
 	rgba() (u32, u32, u32, u32)
 }
 
-// Rgba represents a traditional 32-bit alpha-premultiplied color, having 8
+// RGBA represents a traditional 32-bit alpha-premultiplied color, having 8
 // bits for each of red, green, blue and alpha.
 //
 // An alpha-premultiplied color component C has been scaled by alpha (A), so
 // has valid values 0 <= C <= A.
-pub struct Rgba {
+pub struct RGBA {
 pub:
 	r byte
 	g byte
@@ -26,7 +26,7 @@ pub:
 	a byte
 }
 
-pub fn (rb Rgba) rgba() (u32, u32, u32, u32) {
+pub fn (rb RGBA) rgba() (u32, u32, u32, u32) {
 	mut r := u32(rb.r)
 	r |= r << 8
 
@@ -42,12 +42,12 @@ pub fn (rb Rgba) rgba() (u32, u32, u32, u32) {
 	return r, b, g, a
 }
 
-// Rgba64 represents a 64-bit alpha-premultiplied color, having 16 bits for
+// RGBA64 represents a 64-bit alpha-premultiplied color, having 16 bits for
 // each of red, green, blue and alpha.
 //
 // An alpha-premultiplied color component C has been scaled by alpha (A), so
 // has valid values 0 <= C <= A.
-pub struct Rgba64 {
+pub struct RGBA64 {
 pub:
 	r u16
 	g u16
@@ -55,12 +55,12 @@ pub:
 	a u16
 }
 
-pub fn (c Rgba64) rgba() (u32, u32, u32, u32) {
+pub fn (c RGBA64) rgba() (u32, u32, u32, u32) {
 	return u32(c.r), u32(c.g), u32(c.b), u32(c.a)
 }
 
-// Nrgba represents a non-alpha-premultiplied 32-bit color.
-pub struct Nrgba {
+// NRGBA represents a non-alpha-premultiplied 32-bit color.
+pub struct NRGBA {
 pub:
 	r byte
 	g byte
@@ -68,7 +68,7 @@ pub:
 	a byte
 }
 
-pub fn (c Nrgba) rgba() (u32, u32, u32, u32) {
+pub fn (c NRGBA) rgba() (u32, u32, u32, u32) {
 	mut r := u32(c.r)
 	r |= r << 8
 	r *= u32(c.a)
@@ -89,9 +89,9 @@ pub fn (c Nrgba) rgba() (u32, u32, u32, u32) {
 	return r, g, b, a
 }
 
-// Nrgba64 represents a non-alpha-premultiplied 64-bit color,
+// NRGBA64 represents a non-alpha-premultiplied 64-bit color,
 // having 16 bits for each of red, green, blue and alpha.
-pub struct Nrgba64 {
+pub struct NRGBA64 {
 pub:
 	r u16
 	g u16
@@ -99,7 +99,7 @@ pub:
 	a u16
 }
 
-pub fn (c Nrgba64) rgba() (u32, u32, u32, u32) {
+pub fn (c NRGBA64) rgba() (u32, u32, u32, u32) {
 	mut r := u32(c.r)
 	r *= u32(c.a)
 	r /= 0xffff
@@ -211,55 +211,55 @@ pub fn new_gray16_model() Model {
 }
 
 fn rgba_model(c Color) Color {
-	if c is Rgba {
+	if c is RGBA {
 		return c
 	}
 	r, g, b, a := c.rgba()
-	return Rgba{byte(r >> 8), byte(g >> 8), byte(b >> 8), byte(a >> 8)}
+	return RGBA{byte(r >> 8), byte(g >> 8), byte(b >> 8), byte(a >> 8)}
 }
 
 fn rgba64_model(c Color) Color {
-	if c is Rgba64 {
+	if c is RGBA64 {
 		return c
 	}
 	r, g, b, a := c.rgba()
-	return Rgba64{u16(r), u16(g), u16(b), u16(a)}
+	return RGBA64{u16(r), u16(g), u16(b), u16(a)}
 }
 
 fn nrgba_model(c Color) Color {
-	if c is Nrgba {
+	if c is NRGBA {
 		return c
 	}
 	mut r, mut g, mut b, mut a := c.rgba()
 	if a == 0xffff {
-		return Nrgba{byte(r >> 8), byte(g >> 8), byte(b >> 8), 0xff}
+		return NRGBA{byte(r >> 8), byte(g >> 8), byte(b >> 8), 0xff}
 	}
 	if a == 0 {
-		return Nrgba{0, 0, 0, 0}
+		return NRGBA{0, 0, 0, 0}
 	}
 	// Since Color.rgba returns an alpha-premultiplied color, we should have r <= a && g <= a && b <= a.
 	r = (r * 0xffff) / a
 	g = (g * 0xffff) / a
 	b = (b * 0xffff) / a
-	return Nrgba{byte(r >> 8), byte(g >> 8), byte(b >> 8), byte(a >> 8)}
+	return NRGBA{byte(r >> 8), byte(g >> 8), byte(b >> 8), byte(a >> 8)}
 }
 
 fn nrgba64_model(c Color) Color {
-	if c is Nrgba64 {
+	if c is NRGBA64 {
 		return c
 	}
 	mut r, mut g, mut b, mut a := c.rgba()
 	if a == 0xffff {
-		return Nrgba64{u16(r), u16(g), u16(b), 0xffff}
+		return NRGBA64{u16(r), u16(g), u16(b), 0xffff}
 	}
 	if a == 0 {
-		return Nrgba64{0, 0, 0, 0}
+		return NRGBA64{0, 0, 0, 0}
 	}
 	// Since Color.rgba returns an alpha-premultiplied color, we should have r <= a && g <= a && b <= a.
 	r = (r * 0xffff) / a
 	g = (g * 0xffff) / a
 	b = (b * 0xffff) / a
-	return Nrgba64{u16(r), u16(g), u16(b), u16(a)}
+	return NRGBA64{u16(r), u16(g), u16(b), u16(a)}
 }
 
 fn alpha_model(c Color) Color {

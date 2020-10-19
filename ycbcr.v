@@ -69,7 +69,8 @@ pub fn (y YCbCr) bounds() Rectangle {
 }
 
 pub fn (p YCbCr) at(x int, y int) color.Color {
-	return p.ybcbcr_at(x, y)
+	res := p.ybcbcr_at(x, y) // temporary workaround for now
+	return res
 }
 
 pub fn (yb YCbCr) ybcbcr_at(x int, y int) color.YCbCr {

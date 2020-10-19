@@ -186,13 +186,13 @@ fn ycbcr_model(c Color) Color {
 	return YCbCr{y, u, v}
 }
 */
-pub struct NyCbCr {
+pub struct NYCbCr {
 pub:
 	y YCbCr
 	a byte
 }
 
-fn (c NyCbCr) rgba() (u32, u32, u32, u32) {
+fn (c NYCbCr) rgba() (u32, u32, u32, u32) {
 	// This code is a copy of the YCbCrToRGB fntion above, except that it
 	// returns values in the range [0, 0xffff] instead of [0, 0xff]. There is a
 	// subtle difference between doing this and having YCbCr satisfy the Color
