@@ -1,7 +1,7 @@
 import image
 
-fn test_rectangle() {
-	rects := [
+const (
+	rects = [
 		image.new_rectangle(0, 0, 10, 10),
 		image.new_rectangle(10, 0, 20, 10),
 		image.new_rectangle(1, 2, 3, 4),
@@ -14,7 +14,9 @@ fn test_rectangle() {
 		image.new_rectangle(88, 88, 88, 88),
 		image.new_rectangle(6, 5, 4, 3)
 	]
+)
 
+fn test_inside() {
 	for r in rects {
 		for s in rects {
 			got := r.eq(s)
@@ -26,11 +28,55 @@ fn test_rectangle() {
 			}
 		}
 	}
-	assert true 
-
+	assert true
 }
 
-fn inside(f, g image.Rectangle) bool {
+fn test_intersection() {
+	for r in rects {
+		for s in rects {
+			a := r.intersect(s)
+			if !inside(a, r) {
+				eprintln('intersect r=$r, s=$s, a=$a, a not in r')
+				assert false
+			}
+			if !inside(a, s) {
+				eprintln('intersect r=$r, s=$s, a=$a, a not in r')
+				assert false
+			}
+			img := a == image.Rectangle{} 
+			if img == r.overlaps(s) {
+				eprintln('intersect r=$r, s=$s, a=$a, rect{} is same as overlaps')
+				assert false
+			}
+			mut larger_than_a := [4]image.Rectangle{}
+			larger_than_a[0] = a
+			larger_than_a[1] = a
+			larger_than_a[2] = a
+			larger_than_a[3] = a
+
+			larger_than_a[0].min.x--
+			larger_than_a[1].min.y--
+			larger_than_a[2].max.x--
+			larger_than_a[3].min.y--
+
+			for i, b in larger_than_a {
+				if b.empty() {
+					// b isn't actually larger than a.
+					continue
+				}
+				if inside(b, r) && inside(b, s) {
+					eprintln('intersect r=$r, s=$s, a=$a, b=$s, i=$i: intersection could be larger')
+					assert false
+				}
+			}
+			
+		}
+	}
+	assert true
+}
+
+
+fn inside(f image.Rectangle, g image.Rectangle) bool {
 	if !f.inside(g) {
 		return false
 	}

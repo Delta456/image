@@ -1,6 +1,6 @@
 module color
 
-pub fn ycbcr_to_rgb(y, cb, cr byte) (byte, byte, byte) {
+pub fn ycbcr_to_rgb(y byte, cb byte, cr byte) (byte, byte, byte) {
 	// The JFIF specification says:
 	//	R = Y' + 1.40200*(Cr-128)
 	//	G = Y' - 0.34414*(Cb-128) - 0.71414*(Cr-128)
@@ -81,7 +81,7 @@ pub fn ycbcr_to_rgb(y, cb, cr byte) (byte, byte, byte) {
 	return byte(r), byte(g), byte(b)
 }
 
-pub fn rgb_to_ycbcr(r, g, b byte) (byte, byte, byte) {
+pub fn rgb_to_ycbcr(r byte, g byte, b byte) (byte, byte, byte) {
 	// The JFIF specification says:
 	//	Y' =  0.2990*R + 0.5870*G + 0.1140*B
 	//	Cb = -0.1687*R - 0.3313*G + 0.5000*B + 128
@@ -331,7 +331,7 @@ fn nYCbCrAModel(c Color) Color {
 }
 */
 // rgb_to_cmyk converts an RGB triple to a CMYK quadruple.
-pub fn rgb_to_cmyk(r, g, b byte) (byte, byte, byte, byte) {
+pub fn rgb_to_cmyk(r byte, g byte, b byte) (byte, byte, byte, byte) {
 	rr := u32(r)
 	gg := u32(g)
 	bb := u32(b)
@@ -352,7 +352,7 @@ pub fn rgb_to_cmyk(r, g, b byte) (byte, byte, byte, byte) {
 }
 
 // cmyk_to_rgb converts a CMYK quadruple to an RGB triple.
-fn cmyk_to_rgb(c, m, y, k byte) (byte, byte, byte) {
+fn cmyk_to_rgb(c byte, m byte, y byte, k byte) (byte, byte, byte) {
 	w := 0xffff - u32(k) * 0x101
 	r := (0xffff - u32(c) * 0x101) * w / 0xffff
 	g := (0xffff - u32(m) * 0x101) * w / 0xffff

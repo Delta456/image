@@ -51,7 +51,7 @@ pub fn (p Point) eq(p1 Point) bool{
 	return p.x == p1.x && p.y == p1.y
 }
 
-pub fn new_point(x, y int) Point {
+pub fn new_point(x int, y int) Point {
 	return Point{x, y}
 }
 
@@ -222,7 +222,7 @@ fn (r Rectangle) canon() Rectangle {
 }
 
 // at implements the Image interface.
-fn (r Rectangle) at(x, y int) color.Color {
+fn (r Rectangle) at(x int, y int) color.Color {
 	p := Point{x, y}
 	if p.inside(r) {
 		return color.opaque
@@ -243,7 +243,7 @@ fn (r Rectangle) colormodel() color.Model {
 // new_rectangle is shorthand for Rectangle{Pt(x0, y0), Pt(x1, y1)}. The returned
 // rectangle has minimum and maximum coordinates swapped if necessary so that
 // it is well-formed.
-pub fn new_rectangle(x0, y0, x1, y1 int) Rectangle {
+pub fn new_rectangle(x0 int, y0 int, x1 int, y1 int) Rectangle {
 	mut x, mut x_ := x0, x1
 	mut y, mut y_ := y0, y1
 	if x0 > x1 {
