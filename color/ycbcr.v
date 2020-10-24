@@ -260,13 +260,13 @@ fn ycbcr_model(c Color) Color {
 
 // NYCbCrA represents a non-alpha-premultiplied Y'CbCr-with-alpha color, having
 // 8 bits each for one luma, two chroma and one alpha component.
-struct NYCbCrA {
+pub struct NYCbCrA {
 pub:
 	y YCbCr
 	a byte
 }
 
-fn (c NYCbCrA) rgba() (u32, u32, u32, u32) {
+pub fn (c NYCbCrA) rgba() (u32, u32, u32, u32) {
 	// The first part of this method is the same as YCbCr.rbga.
 	yy1 := int(c.y.y) * 0x10101
 	cb1 := int(c.y.cb) - 128
@@ -305,19 +305,24 @@ fn (c NYCbCrA) rgba() (u32, u32, u32, u32) {
 	return u32(r) * a / 0xffff, u32(g) * a / 0xffff, u32(b) * a / 0xffff, a
 }
 
+/* TODO: comment out this when it doesn't segment faults
 // NYCbCrAModel is the Model for non-alpha-premultiplied Y'CbCr-with-alpha
 // colors.
-/*
-var NYCbCrAModel Model = ModelFunc(nYCbCrAModel)
+fn new_nycbcra_model() Model {
+	return model_fn(nycbcra_model)
+}
 
-fn nYCbCrAModel(c Color) Color {
-	switch c := c.(type) {
-	case NYCbCrA:
+fn nycbcra_model(c Color) Color {
+	match c {
+	NYCbCrA {
 		return c
-	case YCbCr:
+		}
+	YCbCr {
 		return NYCbCrA{c, 0xff}
-	}
-	r, g, b, a := c.rbga()
+		}
+	
+	else {
+	mut r, mut g, mut b, a := c.rgba()
 
 	// Convert from alpha-premultiplied to non-alpha-premultiplied.
 	if a != 0 {
@@ -326,10 +331,14 @@ fn nYCbCrAModel(c Color) Color {
 		b = (b * 0xffff) / a
 	}
 
-	y, u, v := RGBToYCbCr(byte(r>>8), byte(g>>8), byte(b>>8))
-	return NYCbCrA{YCbCr{Y: y, Cb: u, Cr: v}, byte(a >> 8)}
+	y, u, v := rgb_to_ycbcr(byte(r>>8), byte(g>>8), byte(b>>8))
+	return NYCbCrA{YCbCr{y: y, cb: u, cr: v}, byte(a >> 8)}
+
+	}
+	}
 }
 */
+
 // rgb_to_cmyk converts an RGB triple to a CMYK quadruple.
 pub fn rgb_to_cmyk(r byte, g byte, b byte) (byte, byte, byte, byte) {
 	rr := u32(r)
@@ -352,7 +361,7 @@ pub fn rgb_to_cmyk(r byte, g byte, b byte) (byte, byte, byte, byte) {
 }
 
 // cmyk_to_rgb converts a CMYK quadruple to an RGB triple.
-fn cmyk_to_rgb(c byte, m byte, y byte, k byte) (byte, byte, byte) {
+pub fn cmyk_to_rgb(c byte, m byte, y byte, k byte) (byte, byte, byte) {
 	w := 0xffff - u32(k) * 0x101
 	r := (0xffff - u32(c) * 0x101) * w / 0xffff
 	g := (0xffff - u32(m) * 0x101) * w / 0xffff
@@ -364,7 +373,7 @@ fn cmyk_to_rgb(c byte, m byte, y byte, k byte) (byte, byte, byte) {
 // magenta, yellow and black.
 //
 // It is not associated with any particular color profile.
-struct Cmyk {
+pub struct CMYK {
 pub:
 	c byte
 	m byte
@@ -372,7 +381,7 @@ pub:
 	k byte
 }
 
-pub fn (c Cmyk) rgba() (u32, u32, u32, u32) {
+pub fn (c CMYK) rgba() (u32, u32, u32, u32) {
 	// This code is a copy of the cmyk_to_rgb fntion above, except that it
 	// returns values in the range [0, 0xffff] instead of [0, 0xff].
 	w := 0xffff - u32(c.k) * 0x101
@@ -388,10 +397,10 @@ pub fn new_cmyk_model() Model {
 }
 
 fn cmyk_model(c Color) Color {
-	if c is Cmyk {
+	if c is CMYK {
 		return c
 	}
 	r, g, b, _ := c.rgba()
 	cc, mm, yy, kk := rgb_to_cmyk(byte(r >> 8), byte(g >> 8), byte(b >> 8))
-	return Cmyk{cc, mm, yy, kk}
+	return CMYK{cc, mm, yy, kk}
 }
