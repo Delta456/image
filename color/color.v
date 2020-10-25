@@ -310,29 +310,32 @@ fn gray16_model(c Color) Color {
 	y := (19595 * r + 38470 * g + 7471 * b + 1 << 15) >> 16
 	return Gray16{u16(y)}
 }
-/*
+
+// TODO: think of implementing this in the most error prone way
+
 // Palette is a palette of colors.
-pub type Palette = []Color
+//pub type Palette = []Color
+/*
+pub struct Palette {
+pub:
+	colors []Color
+}
 
 // convert returns the palette color closest to c in Euclidean R,G,B space.
 pub fn (p Palette) convert(c Color) ?Color {
-	if p.len == 0 {
+	if p.colors.len == 0 {
 		return none
 	}
-	return p[p.index(c)]
+	return p.colors[p.index(c)]
 }
-/*
-pub fn (p Palette) rgba() (u32, u32, u32, u32) {
-	return 0, 0, 0, 0
-}*/
 
 // index returns the index of the palette color closest to c in Euclidean
 // R,G,B,A space.
-fn (p Palette) index(c Color) int {
+pub fn (p Palette) index(c Color) int {
 	// A batch version of this computation is in image/draw/draw.go.
 	cr, cg, cb, ca := c.rgba()
 	mut ret, mut best_sum := 0, u32(1<<32-1)
-	for i, v in p {
+	for i, v in p.colors {
 		vr, vg, vb, va := v.rgba()
 		sum := sq_diff(cr, vr) + sq_diff(cg, vg) + sq_diff(cb, vb) + sq_diff(ca, va)
 		if sum < best_sum {
@@ -344,12 +347,15 @@ fn (p Palette) index(c Color) int {
 	}
 	return 0
 }
+*/
+
+// TODO: remove `pub` declaration when this function declaration will be added to colors/color_test.v
 
 // sqDiff returns the squared-difference of x and y, shifted by 2 so that
 // adding four of those won't overflow a u32.
 //
 // x and y are both assumed to be in the range [0, 0xffff].
-fn sq_diff(x u32, y u32) u32 {
+pub fn sq_diff(x u32, y u32) u32 {
 	// The canonical code of this function looks as follows:
 	//
 	//	mut d := u32(0)
@@ -375,7 +381,7 @@ fn sq_diff(x u32, y u32) u32 {
 	d := x - y
 	return (d * d) >> 2
 }
-*/
+
 pub const (
 	black       = Gray16{0}
 	white       = Gray16{0xffffff}

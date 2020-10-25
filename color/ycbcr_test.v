@@ -119,34 +119,34 @@ fn test_cmyk_gray() {
 	}
 	assert true
 }
-/*
+/* TODO: enable this test when I can think of the most suitable way
 fn test_palette() {
-	p := color.Palette([
-		color.RGBA{0xff, 0xff, 0xff, 0xff},
+	p := color.Palette{
+		colors: [color.RGBA{0xff, 0xff, 0xff, 0xff},
 		color.RGBA{0x80, 0x00, 0x00, 0xff},
 		color.RGBA{0x7f, 0x00, 0x00, 0x7f},
 		color.RGBA{0x00, 0x00, 0x00, 0x7f},
 		color.RGBA{0x00, 0x00, 0x00, 0x00},
-		color.RGBA{0x40, 0x40, 0x40, 0x40},
-	])
+		color.RGBA{0x40, 0x40, 0x40, 0x40}]
+	}
 	// Check that, for a Palette with no repeated colors, the closest color to
 	// each element is itself.
-	/*for i, c in p {
-		j := p.index(c) or { none }
+	for i, c in p.colors {
+		j := p.index(c)
 		if i != j {
-			eprintln('index($c): got $j color = ${p.index(j)}, want $i')
+			//eprintln('got $j color = ${p.index(j)}, want $i')
 			assert false
 			//t.Errorf("Index(%v): got %d (color = %v), want %d", c, j, p[j], i)
 		}
-	}*/
+	}
 	// Check that finding the closest color considers alpha, not just red,
 	// green and blue.
-	got := p.convert(color.RGBA{0x80, 0x00, 0x00, 0x80}) or { none }
+	/*got := p.convert(color.RGBA{0x80, 0x00, 0x00, 0x80}) or { none }
 	want := color.RGBA{0x7f, 0x00, 0x00, 0x7f}
 	if got != want {
-		eprintln('got=$got, want=$want')
+		//eprintln('got=$got, want=$want')
 		assert false
-	}
+	}*/
 	assert true
 }
 */

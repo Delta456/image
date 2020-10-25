@@ -1,6 +1,6 @@
 module image
 
-//import math.bits
+import math.bits { mul_64 }
 import image.color
 
 pub struct Point {
@@ -254,29 +254,29 @@ pub fn new_rectangle(x0 int, y0 int, x1 int, y1 int) Rectangle {
 	}
 	return Rectangle{Point{x, y}, Point{x_, y_}}
 }
-/*
-// mul3NonNeg returns (x * y * z), unless at least one argument is negative or
+
+// mul3_nonneg returns (x * y * z), unless at least one argument is negative or
 // if the computation overflows the int type, in which case it returns -1.
 fn mul3_nonneg(x int, y int, z int) int {
 	if (x < 0) || (y < 0) || (z < 0) {
 		return -1
 	}
-	hi, lo := bits.Mul64(uint64(x), uint64(y))
+	mut hi, mut lo := mul_64(u64(x), u64(y))
 	if hi != 0 {
 		return -1
 	}
-	hi, lo = bits.Mul64(lo, uint64(z))
+	hi, lo = mul_64(lo, u64(z))
 	if hi != 0 {
 		return -1
 	}
 	a := int(lo)
-	if (a < 0) || (uint64(a) != lo) {
+	if (a < 0) || (u64(a) != lo) {
 		return -1
 	}
 	return a
 }
 
-// add2NonNeg returns (x + y), unless at least one argument is negative or if
+// add2_nonneg returns (x + y), unless at least one argument is negative or if
 // the computation overflows the int type, in which case it returns -1.
 fn add2_nonneg(x int, y int) int {
 	if (x < 0) || (y < 0) {
@@ -288,5 +288,3 @@ fn add2_nonneg(x int, y int) int {
 	}
 	return a
 }
-
-*/

@@ -36,6 +36,21 @@ pub interface PalettedImage {
 	at(x int, y int) color.Color
 }
 
+// pixel_buffer_length returns the length of the []byte typed Pix slice field
+// for the new_xxx functions. Conceptually, this is just (bpp * width * height),
+// but this function panics if at least one of those is negative or if the
+// computation would overflow the int type.
+//
+// This panics instead of returning an error because of backwards
+// compatibility. The new_xxx functions do not return an error.
+fn pixel_buffer_length(bytes_per_pixel int, r Rectangle, img_type_name string) int {
+	total_length := mul3_nonneg(bytes_per_pixel, r.dx(), r.dy())
+	if total_length < 0 {
+		panic("image: New $img_type_name Rectangle has huge or negative dimensions")
+	}
+	return total_length
+}
+
 pub struct RGBA {
 	// pix holds the image's pixels, in R, G, B, A order. The pixel at
 	// (x, y) starts at pix[(y-rect.min.y)*stride + (x-rect.min.x)*4].
@@ -101,4 +116,49 @@ pub fn (r RGBA) set_rgba(x int, y int, c color.RGBA) {
 	s[1] = c.g
 	s[2] = c.b
 	s[3] = c.a
+}
+
+// sub_img returns an image representing the portion of the image p visible
+// through r. The returned value shares pixels with the original image.
+pub fn (r RGBA) sub_img(r1 Rectangle) Image {
+	rect := r1.intersect(r.rect)
+	// If r1 and r2 are Rectangles, r1.intersect(r2) is not guaranteed to be inside
+	// either r1 or r2 if the intersection is empty. Without explicitly checking for
+	// this, the pix[i:] expression below can panic.
+	if rect.empty() {
+		return &RGBA{}
+	}
+	i := r.pix_offset(r1.min.x, r1.min.y)
+	return &RGBA{
+		pix:    r.pix[i..],
+		stride: r.stride,
+		rect:   r1,
+	}
+}
+
+// opaque scans the entire image and reports whether it is fully opaque.
+pub fn (r RGBA) opaque() bool {
+	if r.rect.empty() {
+		return true
+	}
+	mut i0, mut i1 := 3, r.rect.dx()*4
+	for y := r.rect.min.y; y < r.rect.max.y; y++ {
+		for i := i0; i < i1; i += 4 {
+			if r.pix[i] != 0xff {
+				return false
+			}
+		}
+		i0 += r.stride
+		i1 += r.stride
+	}
+	return true
+}
+
+// new_rgba returns a new RGBA image with the given bounds.
+pub fn new_rgba(r Rectangle) &RGBA {
+	return &RGBA{
+		pix:    []byte{init: pixel_buffer_length(4, r, "RGBA")},
+		stride: 4 * r.dx(),
+		rect:   r,
+	}
 }
