@@ -26,9 +26,9 @@ A port of Go's stdlib/image to V. It is Highly Work in Progress.
 - [x] `image/color/color_test.v`
 - [x] `image/name.v`
 - [ ] `image/image_test.v` (not started in lieu of insufficient progress in `image/image.v`)
-- [ ] `image/ycbcr.v` (50% done)
+- [ ] `image/ycbcr.v` (98% done)
   - [x] YCbCr
-  - [ ] NYCbCrA
+  - [ ] NYCbCrA (2% left to do)
 - [ ] `image/image.v` (~15% done)
     - [x] RGBA
     - [x] RGBA64

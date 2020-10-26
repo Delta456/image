@@ -306,7 +306,7 @@ pub fn (p NRGBA) color_model() color.Model { return color.new_nrgba_model() }
 pub fn (p NRGBA) bounds() Rectangle { return p.rect }
 
 pub fn (p NRGBA) at(x int , y int) color.Color {
-	res := p.nrgba_at(x, y)
+	res := p.nrgba_at(x, y) // temporary workaround
 	return res
 }
 

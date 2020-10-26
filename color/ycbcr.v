@@ -262,7 +262,7 @@ fn ycbcr_model(c Color) Color {
 // 8 bits each for one luma, two chroma and one alpha component.
 pub struct NYCbCrA {
 pub:
-	y YCbCr
+	y YCbCr // TODO: struct embed this
 	a byte
 }
 
