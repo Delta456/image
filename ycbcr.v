@@ -2,8 +2,7 @@ module image
 
 import image.color
 
-
-// YCbCrSubsampleRatio is the chroma subsample ratio used in a YCbCr image.
+// YCbCrratio is the chroma subsample ratio used in a YCbCr image.
 pub enum YCbCr_Subsample_Ratio {
 	ratio_444
 	ratio_422
@@ -56,7 +55,7 @@ struct YCbCr {
 	cr []byte
 	ystride int
 	cstride int
-	sub_sample_ratio YCbCr_Subsample_Ratio
+	ratio YCbCr_Subsample_Ratio
 	rect Rectangle
 }
 
@@ -93,8 +92,10 @@ pub fn (p YCbCr) y_offset(x int, y int) int {
 	return (y-p.rect.min.y)*p.ystride + (x - p.rect.min.x)
 }
 
+// c_offset returns the index of the first element of Cb or Cr that corresponds
+// to the pixel at (x, y).
 pub fn (p YCbCr) c_offset(x int, y int) int {
-	match p.sub_sample_ratio {
+	match p.ratio {
 		.ratio_422 {
 			return (y-p.rect.min.y)*p.cstride + (x/2 - p.rect.min.x/2)
 		}
@@ -121,3 +122,90 @@ pub fn (p YCbCr) opaque() bool {
 	return true
 }
 
+// sub_img returns an image representing the portion of the image p visible
+// through r. The returned value shares pixels with the original image.
+pub fn (p YCbCr) sub_img(r Rectangle) Image {
+	r1 = r.intersect(p.rect)
+	// If r1 and r2 are Rectangles, r1.Intersect(r2) is not guaranteed to be inside
+	// either r1 or r2 if the intersection is empty. Without explicitly checking for
+	// this, the Pix[i:] expression below can panic.
+	if r1.empty() {
+		return &YCbCr{
+			ratio: p.ratio,
+		}
+	}
+	yi := p.y_offset(r1.min.x, r.min.y)
+	ci := p.c_offset(r1.min.x, r.min.y)
+	return &YCbCr{
+		y:              p.y[yi..],
+		cb:             p.cb[ci..],
+		cr:             p.cr[ci..],
+		ratio:          p.ratio,
+		ystride:        p.ystride,
+		cstride:        p.cstride,
+		rect:           r1,
+	}
+
+}
+
+fn ycbcr_size(r Rectangle, ratio YCbCr_Subsample_Ratio) (int, int, int, int) {
+	w, h := r.dx(), r.dy()
+	mut cw, mut ch := int(0), int(0)
+	match ratio {
+		.ratio_422 {
+			cw = (r.max.x+1)/2 - r.min.x/2
+			ch = h
+		}
+		.ratio_420 {
+			cw = (r.max.x+1)/2 - r.min.x/2
+			ch = (r.max.y+1)/2 - r.min.y/2
+		}
+		.ratio_440 {
+			cw = w
+			ch = (r.max.y+1)/2 - r.min.y/2
+		}
+		.ratio_411 {
+			cw = (r.max.x+3)/4 - r.min.x/4
+			ch = h
+		}
+		.ratio_410 {
+			cw = (r.max.x+3)/4 - r.min.x/4
+			ch = (r.max.y+1)/2 - r.min.y/2
+		}
+		else {
+			// Default to 4:4:4 subsampling.
+			cw = w
+			ch = h
+		}
+	}
+	return w, h, cw, ch
+}
+
+// new_ycbcr returns a new YCbCr image with the given bounds and subsample
+// ratio.
+pub fn new_ycbcr(r Rectangle, ratio YCbCr_Subsample_Ratio) &YCbCr {
+	w, h, cw, ch := ycbcr_size(r, ratio)
+
+	// total_length should be the same as i2, below, for a valid Rectangle r.
+	total_length := add2_nonneg(
+		mul3_nonneg(1, w, h),
+		mul3_nonneg(2, cw, ch),
+	)
+	if total_length < 0 {
+		panic("image: new_ycbcr Rectangle has huge or negative dimensions")
+	}
+
+	i0 := w*h + 0*cw*ch
+	i1 := w*h + 1*cw*ch
+	i2 := w*h + 2*cw*ch
+	b := []byte{ init: i2 }
+	return &YCbCr{
+		y:              b[..i0],
+		cb:             b[i0..i1],
+		cr:             b[i1..i2],
+		ratio: ratio,
+		ystride:        w,
+		cstride:        cw,
+		rect:           r,
+	}
+}

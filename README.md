@@ -4,19 +4,35 @@ A port of Go's stdlib/image to V. It is Highly Work in Progress.
 
 ## TODO List
 
-- [x] `image/color/color.v`
-- [x] `image/color/ycbcr.v`
+- [ ] `image/color/color.v` (~98% done)
+  - [x] RGBA
+  - [x] RGBA64
+  - [x] NRGBA
+  - [x] NRGBA64
+  - [x] Alpha
+  - [x] Alpha16
+  - [x] Gray
+  - [x] Gray16
+  - [ ] Palette (need more to think on this to how to do it with current limitations)
+- [ ] `image/color/ycbcr.v` (~98% done)
+  - [x] YCbCr
+  - [x] NYCbCr
+  - [x] YCbCrA
+  - [x] CMYK
+  - [ ] NYCbCrA (need more to think on this to how to do it with current limitations)
 - [x] `image/geom.v`
 - [ ] `image/geom_test.v` (~20% done, tests are failing for some reason)
-- [ ] `image/color/ycbcr_test.v` (~30% done)
+- [ ] `image/color/ycbcr_test.v` (~30% done, tests are failing for some reason)
 - [x] `image/color/color_test.v`
 - [x] `image/name.v`
 - [ ] `image/image_test.v` (not started in lieu of insufficient progress in `image/image.v`)
-- [ ] `image/ycbcr.v` (~40% done)
-- [ ] `image/image.v` (~11% done)
+- [ ] `image/ycbcr.v` (50% done)
+  - [x] YCbCr
+  - [ ] NYCbCrA
+- [ ] `image/image.v` (~15% done)
     - [x] RGBA
-    - [ ] RGBA64
-    - [ ] NRGBA
+    - [x] RGBA64
+    - [x] NRGBA
     - [ ] NRGBA64
     - [ ] Alpha
     - [ ] Alpha16
