@@ -175,7 +175,7 @@ pub struct RGBA64 {
 }
 
 pub fn (p RGBA64) color_model() color.Model {
-	return new_rgba64_model()
+	return color.new_rgba64_model()
 }
 
 pub fn (p RGBA64) bounds() Rectangle {
@@ -205,7 +205,7 @@ pub fn (p RGBA64) rgba64_at(x int, y int) color.RGBA64 {
 
 // pix_offset returns the index of the first element of `pix` that corresponds to
 // the pixel at (x, y).
-pub fn (p RGBA) pix_offset(x int, y int) int {
+pub fn (p RGBA64) pix_offset(x int, y int) int {
 	return (y-p.rect.min.y)*p.stride + (x-p.rect.min.x)*8
 }
 
@@ -230,7 +230,7 @@ fn (p RGBA64) set(x int , y int, c color.Color) {
 
 pub fn (p RGBA64) set_rgba64(x int, y int, c color.RGBA64) {
 	point := Point{x, y}
-	if !point.inside(p.rect)) {
+	if !point.inside(p.rect) {
 		return
 	}
 	i := p.pix_offset(x, y)
@@ -275,8 +275,8 @@ pub fn (p RGBA64) opaque() bool {
 				return false
 			}
 		}
-		i0 += p.Stride
-		i1 += p.Stride
+		i0 += p.stride
+		i1 += p.stride
 	}
 	return true
 }
@@ -301,21 +301,22 @@ pub struct NRGBA {
 	rect Rectangle
 }
 
-pub fn (p NRGBA) color_model() color.Model { return color.NRGBAModel }
+pub fn (p NRGBA) color_model() color.Model { return color.new_nrgba_model() }
 
-pub fn (p NRGBA) bounds() Rectangle { return p.Rect }
+pub fn (p NRGBA) bounds() Rectangle { return p.rect }
 
 pub fn (p NRGBA) at(x int , y int) color.Color {
-	return p.nrgba_at(x, y)
+	res := p.nrgba_at(x, y)
+	return res
 }
 
-pub fn (p *NRGBA) nrgba_at(x int, y int) color.NRGBA {
+pub fn (p NRGBA) nrgba_at(x int, y int) color.NRGBA {
 	po := Point{x, y}
 	if !po.inside(p.rect) {
 		return color.NRGBA{}
 	}
 	i := p.pix_offset(x, y)
-	s := p.Pix[i..i+4]
+	s := p.pix[i..i+4]
 	return color.NRGBA{s[0], s[1], s[2], s[3]}
 }
 
@@ -339,7 +340,7 @@ pub fn (p NRGBA) set(x int, y int, c color.Color) {
 }
 */
 
-pub fn (p NRGBA) set_nrgba(x, y int, c color.NRGBA) {
+pub fn (p NRGBA) set_nrgba(x int, y int, c color.NRGBA) {
 	po := Point{x, y}
 	if !po.inside(p.rect) {
 		return
@@ -364,7 +365,7 @@ pub fn (p NRGBA) sub_img(r Rectangle) Image {
 	}
 	i := p.pix_offset(r1.min.x, r1.min.y)
 	return &NRGBA{
-		pix:    p.pix[i:],
+		pix:    p.pix[i..],
 		stride: p.stride,
 		rect:   r1,
 	}
@@ -372,18 +373,18 @@ pub fn (p NRGBA) sub_img(r Rectangle) Image {
 
 // Opaque scans the entire image and reports whether it is fully opaque.
 pub fn (p NRGBA) opaque() bool {
-	if p.rect.Empty() {
+	if p.rect.empty() {
 		return true
 	}
-	mut i0, mut i1 := 3, p.Rect.Dx()*4
+	mut i0, mut i1 := 3, p.rect.dx()*4
 	for y := p.rect.min.y; y < p.rect.max.y; y++ {
 		for i := i0; i < i1; i += 4 {
-			if p.Pix[i] != 0xff {
+			if p.pix[i] != 0xff {
 				return false
 			}
 		}
-		i0 += p.Stride
-		i1 += p.Stride
+		i0 += p.stride
+		i1 += p.stride
 	}
 	return true
 }

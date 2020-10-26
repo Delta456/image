@@ -125,7 +125,7 @@ pub fn (p YCbCr) opaque() bool {
 // sub_img returns an image representing the portion of the image p visible
 // through r. The returned value shares pixels with the original image.
 pub fn (p YCbCr) sub_img(r Rectangle) Image {
-	r1 = r.intersect(p.rect)
+	r1 := r.intersect(p.rect)
 	// If r1 and r2 are Rectangles, r1.Intersect(r2) is not guaranteed to be inside
 	// either r1 or r2 if the intersection is empty. Without explicitly checking for
 	// this, the Pix[i:] expression below can panic.
